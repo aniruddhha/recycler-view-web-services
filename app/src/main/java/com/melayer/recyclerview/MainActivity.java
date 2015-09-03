@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MeAdapter adapter;
 
-    private ArrayList<MeRecyclerItem> listItem;
+    private ArrayList<MeRecyclerItem> listItem = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +33,13 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new MeAdapter(this,listItem);
 
         getDataFromServerSampleMethod();
 
-        postDataToServerSampleMethod();;
+        postDataToServerSampleMethod();
+
+        initSwipers();
 
     }
 
@@ -76,10 +79,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
 
-                if (direction == ItemTouchHelper.LEFT) {
+                if (direction == ItemTouchHelper.RIGHT) {
 
+                    Log.i(MainActivity.class.getCanonicalName(),""+viewHolder.getAdapterPosition());
+                    adapter.removeItemFromRecycler(viewHolder.getAdapterPosition());
 
-                    // adapter.removeItemFromRecycler(viewHolder.getAdapterPosition());
+                    adapter.printListSize();
                 }
             }
         };
@@ -116,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
                     listItem.add(item);
                 }
 
-                recyclerView.setAdapter(new MeAdapter(MainActivity.this, listItem));
+                adapter.haveFreshDataset(listItem);
+                recyclerView.setAdapter(adapter);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -151,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
                     .body();
 
             Log.i(this.getClass().toString(), "Response from server " + responseJson);
-
 
             return responseJson;
         }
