@@ -1,13 +1,12 @@
 package com.melayer.recyclerview;
 
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.melayer.dto.MeAdmin;
 import com.melayer.dto.MeDevice;
@@ -46,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private void getDataFromServerSampleMethod(){
 
         //Get Data from web Server
-        new MeGetAnyObject().execute("");
+        new MeGetAnyObject().execute("http://54.169.194.108:8080/locatewebservices/devices/70996");
     }
 
     private void postDataToServerSampleMethod(){
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         deviceModel.setIsTrackingOn(true);
         deviceModel.setPushNotificationId("adfiuafjhjhhgjhgjhiafhu");
 
-        new MePostAnyObjectTask<MeDeviceModel>("").execute(deviceModel);
+        new MePostAnyObjectTask<MeDeviceModel>("http://54.169.194.108:8080/locatewebservices/registerNewDevice").execute(deviceModel);
     }
 
     private void initSwipers(){
@@ -102,17 +101,10 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i(MainActivity.class.toString(), "" + data);
 
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
             try {
 
                 listItem = new ArrayList<>();
-                MeAdmin admin = JsonMan.<MeAdmin>toObject(s, MeAdmin.class);
+                MeAdmin admin = JsonMan.<MeAdmin>toObject(data, MeAdmin.class);
                 Log.i(MainActivity.class.toString(), admin.toString());
 
                 for (MeDevice device : admin.getRegisteredDevices()) {
@@ -121,12 +113,20 @@ public class MainActivity extends AppCompatActivity {
                     listItem.add(item);
                 }
 
-                adapter.haveFreshDataset(listItem);
-                recyclerView.setAdapter(adapter);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            adapter.haveFreshDataset(listItem);
+            recyclerView.setAdapter(adapter);
+
         }
     }
 
@@ -158,6 +158,15 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i(this.getClass().toString(), "Response from server " + responseJson);
 
+            try {
+
+                MeInfo info = JsonMan.<MeInfo>toObject(responseJson, MeInfo.class);
+                Log.i(MePostAnyObjectTask.class.toString(), "" + info);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             return responseJson;
         }
 
@@ -165,15 +174,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            try {
-
-                MeInfo info = JsonMan.<MeInfo>toObject(s, MeInfo.class);
-                Log.i(MePostAnyObjectTask.class.toString(), "" + info);
-                Toast.makeText(MainActivity.this,"\n Status -  "+info.getStatus() +"\n Message - "+info.getMessage() +"\n Actor - "+info.getActor(),Toast.LENGTH_LONG).show();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }
