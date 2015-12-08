@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private void getDataFromServerSampleMethod(){
 
         //Get Data from web Server
-        new MeGetAnyObject().execute("http://54.169.194.108:8080/locatewebservices/devices/70996");
+        new MeGetAnyObject().execute("");
     }
 
     private void postDataToServerSampleMethod(){
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         deviceModel.setIsTrackingOn(true);
         deviceModel.setPushNotificationId("adfiuafjhjhhgjhgjhiafhu");
 
-        new MePostAnyObjectTask<MeDeviceModel>("http://54.169.194.108:8080/locatewebservices/registerNewDevice").execute(deviceModel);
+        new MePostAnyObjectTask<MeDeviceModel>("").execute(deviceModel);
     }
 
     private void initSwipers(){
